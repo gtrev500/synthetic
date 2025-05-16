@@ -16,7 +16,7 @@ class DatabaseManager:
     def __init__(self, db_path: str = "synthetic_essays.db"):
         self.engine = create_engine(f"sqlite:///{db_path}", echo=False)
         Base.metadata.create_all(self.engine)
-        self.SessionLocal = sessionmaker(bind=self.engine)
+        self.SessionLocal = sessionmaker(bind=self.engine, expire_on_commit=False)
     
     @contextmanager
     def get_session(self):
