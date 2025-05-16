@@ -8,7 +8,7 @@ class PerplexityClient:
         self.api_key = api_key
         self.base_url = "https://api.perplexity.ai"
     
-    async def search(self, query: str, model: str = "llama-2-70b") -> Dict:
+    async def search(self, query: str, model: str = "sonar") -> Dict:
         headers = {
             "Authorization": f"Bearer {self.api_key}",
             "Content-Type": "application/json"
