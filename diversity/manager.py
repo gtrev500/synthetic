@@ -1,11 +1,11 @@
 import random
 from typing import Dict, List
 
-from .stances import StanceManager
-from .personas import PersonaManager
-from .evidence import EvidenceManager
-from .styles import StyleManager
-from .quality import QualityManager
+from diversity.stances import StanceManager
+from diversity.personas import PersonaManager
+from diversity.evidence import EvidenceManager
+from diversity.styles import StyleManager
+from diversity.quality import QualityManager
 
 class DiversityManager:
     def __init__(self):

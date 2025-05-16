@@ -2,9 +2,9 @@ import asyncio
 from datetime import datetime
 from typing import Dict, List
 
-from ..database.manager import DatabaseManager
-from ..diversity.manager import DiversityManager
-from .llm_manager import LLMManager
+from database.manager import DatabaseManager
+from diversity.manager import DiversityManager
+from generation.llm_manager import LLMManager
 
 class EssayGenerator:
     def __init__(self, models_config: List[Dict], db_manager: DatabaseManager):

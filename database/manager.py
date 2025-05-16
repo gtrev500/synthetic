@@ -7,7 +7,7 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, Session
 from sqlalchemy.exc import SQLAlchemyError
 
-from .schema import (
+from database.schema import (
     Base, ResearchSeed, Stance, Persona, EvidencePattern,
     StyleParameter, QualityLevel, Essay, GenerationRun
 )

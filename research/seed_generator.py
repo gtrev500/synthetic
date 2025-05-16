@@ -1,7 +1,7 @@
 import asyncio
 from typing import List, Dict
 
-from .perplexity import PerplexityClient
+from research.perplexity import PerplexityClient
 
 class ResearchSeedGenerator:
     def __init__(self, api_key: str):

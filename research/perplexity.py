@@ -30,7 +30,7 @@ class PerplexityClient:
         
         async with aiohttp.ClientSession() as session:
             async with session.post(
-                f"{self.base_url}/v1/chat/completions",
+                f"{self.base_url}/chat/completions",
                 headers=headers,
                 json=payload
             ) as response:
