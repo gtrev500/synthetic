@@ -61,14 +61,29 @@ async def example_quality_distribution():
     
     print(f"\nSuccess! Check the output at: output/{run_id}/")
 
+async def example_minimal():
+    """Generate just 3 essays for ultra-quick testing."""
+    
+    system = SyntheticEssaySystem()
+    
+    topic = """
+    Should college education be free? Analyze the economic and social implications.
+    """
+    
+    print("Generating minimal corpus (3 essays)...")
+    run_id = await system.generate_essay_corpus(topic, num_essays=3)
+    
+    print(f"\nSuccess! Check the output at: output/{run_id}/")
+
 if __name__ == "__main__":
     # Choose which example to run
     print("Synthetic Essay Generation Examples")
     print("1. Small test corpus (10 essays)")
     print("2. Custom topic (30 essays)")
     print("3. Full corpus with quality distribution (50 essays)")
+    print("4. Minimal test corpus (3 essays)")
     
-    choice = input("\nSelect example (1-3): ")
+    choice = input("\nSelect example (1-4): ")
     
     if choice == "1":
         asyncio.run(example_small_corpus())
@@ -76,5 +91,7 @@ if __name__ == "__main__":
         asyncio.run(example_custom_topic())
     elif choice == "3":
         asyncio.run(example_quality_distribution())
+    elif choice == "4":
+        asyncio.run(example_minimal())
     else:
-        print("Invalid choice. Please run again and select 1-3.")
+        print("Invalid choice. Please run again and select 1-4.")

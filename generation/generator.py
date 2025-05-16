@@ -45,7 +45,7 @@ class EssayGenerator:
                 style = self.db_manager.save_style_parameters(metadata['style'])
                 quality = self.db_manager.save_quality_level(metadata['quality'])
                 
-                # Prepare essay data for database
+                # Prepare essay data for database while preserving metadata
                 essay_data = {
                     'content': essay['content'],
                     'seed_id': metadata['seed']['id'] if 'id' in metadata['seed'] else None,
@@ -56,7 +56,8 @@ class EssayGenerator:
                     'quality_id': quality.id,
                     'model_name': essay['model_name'],
                     'temperature': essay['temperature'],
-                    'prompt_hash': essay['prompt_hash']
+                    'prompt_hash': essay['prompt_hash'],
+                    'metadata': metadata  # Preserve original metadata for export
                 }
                 
                 all_essays.append(essay_data)
