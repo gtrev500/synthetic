@@ -38,6 +38,12 @@ class EssayGenerator:
                 # Extract metadata components
                 metadata = essay['metadata']
                 
+                # Append citations to the essay content
+                content_with_citations = self._append_citations(
+                    essay['content'], 
+                    metadata['seed'].get('sources', [])
+                )
+                
                 # Save components to database if they don't exist
                 stance = self.db_manager.get_or_create_stance(metadata['stance'])
                 persona = self.db_manager.save_persona(metadata['persona'])
@@ -47,7 +53,7 @@ class EssayGenerator:
                 
                 # Prepare essay data for database while preserving metadata
                 essay_data = {
-                    'content': essay['content'],
+                    'content': content_with_citations,
                     'seed_id': metadata['seed']['id'] if 'id' in metadata['seed'] else None,
                     'stance_id': stance.id,
                     'persona_id': persona.id,
@@ -67,6 +73,20 @@ class EssayGenerator:
                 await asyncio.sleep(1)
         
         return all_essays
+    
+    def _append_citations(self, content: str, sources: List[str]) -> str:
+        """Append properly formatted citations to the essay content."""
+        if not sources:
+            return content
+        
+        # Add a double newline to separate citations from the main essay
+        citations = "\n\n## References\n\n"
+        
+        # Format each source as a numbered reference
+        for i, source in enumerate(sources, 1):
+            citations += f"{i}. {source}\n"
+        
+        return content + citations
     
     async def generate_with_diversity_report(self, combinations: List[Dict], 
                                           batch_size: int = 5) -> Dict:
