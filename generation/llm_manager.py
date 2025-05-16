@@ -6,14 +6,17 @@ from concurrent.futures import ThreadPoolExecutor
 import litellm
 from litellm import acompletion
 
+from .token_calculator import get_model_token_config
+
 class LLMManager:
-    def __init__(self, models_config: List[Dict]):
+    def __init__(self, models_config: List[Dict], base_tokens: int = 1500):
         self.models = models_config
+        self.base_tokens = base_tokens
         self.executor = ThreadPoolExecutor(max_workers=10)
         
         # Configure litellm
         litellm.drop_params = True
-        litellm.set_verbose = False
+        litellm.set_verbose = True
     
     async def generate_essay(self, prompt: str, model_config: Dict, metadata: Dict) -> Optional[Dict]:
         """Generate a single essay using specified model."""
@@ -30,26 +33,37 @@ class LLMManager:
                 }
             ]
             
+            # Calculate model-specific token configuration
+            token_config = get_model_token_config(model_config, self.base_tokens)
+            
+            # Log token configuration for debugging
+            print(f"Token config for {model_config['name']}: max_tokens={token_config['max_tokens']}, "
+                  f"estimated_words={token_config['estimated_words']}, provider={token_config['provider']}")
+            
             # Model-specific adjustments
             kwargs = {
                 "model": model_config["model"],
                 "messages": messages,
                 "temperature": model_config.get("temperature", 0.8),
-                "max_tokens": model_config.get("max_tokens", 1500)
+                "max_tokens": token_config["max_tokens"]
             }
             
             # Add provider-specific parameters
-            if model_config["provider"] == "anthropic" and "claude-3" in model_config["model"]:
+            if model_config["provider"] == "anthropic" and "claude-3-7" in model_config["model"]:
                 # Enable Claude's thinking mode if available
-                if "temperature" in kwargs and kwargs["temperature"] > 0.9:
-                    kwargs["anthropic_extra_headers"] = {
-                        "anthropic-thinking": "true"
-                    }
+                if "temperature" in kwargs and kwargs["temperature"] == 1.0:
+                    kwargs["reasoning_effort"] = "low"
+            elif model_config["provider"] == "gemini":
+                kwargs["reasoning_effort"] = "low"
             
             # Make the API call
             response = await acompletion(**kwargs)
             
             content = response.choices[0].message.content
+
+            if content is None:
+                print(f"LLM {model_config['name']} returned None content for prompt. Failing prompt:\n{prompt}")
+                return None
             
             # Calculate prompt hash for tracking
             prompt_hash = hashlib.sha256(prompt.encode()).hexdigest()

@@ -6,25 +6,26 @@ output:
 
 models:
   - name: ChatGPT 4o
-    model: gpt-4o
+    model: openai/gpt-4o
     provider: openai
     temperature: 0.8
-    max_tokens: 1500
+    token_multiplier: 1.0
   - name: Gemini 2.5 Pro
-    model: gemini-2.5-pro-preview
+    model: gemini/gemini-2.5-pro-preview-05-06
     provider: gemini
     temperature: 0.8
-    max_tokens: 1500
+    token_multiplier: 2.0  # 2x for thinking tokens overhead
   - name: Claude 3.7 Sonnet
-    model: claude-3-7-sonnet
+    model: anthropic/claude-3-7-sonnet-latest
     provider: anthropic
     temperature: 1.0
-    max_tokens: 1500
+    token_multiplier: 1.2  # 1.2x for slightly more verbose responses
 
 generation:
   default_num_essays: 60
   batch_size: 5
+  base_max_tokens: 1500
 
 research:
   num_seeds: 10
-  perplexity_model: llama-2-70b
+  perplexity_model: sonar

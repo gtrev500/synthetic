@@ -7,8 +7,8 @@ from diversity.manager import DiversityManager
 from generation.llm_manager import LLMManager
 
 class EssayGenerator:
-    def __init__(self, models_config: List[Dict], db_manager: DatabaseManager):
-        self.llm_manager = LLMManager(models_config)
+    def __init__(self, models_config: List[Dict], db_manager: DatabaseManager, base_tokens: int = 1500):
+        self.llm_manager = LLMManager(models_config, base_tokens)
         self.db_manager = db_manager
         self.diversity_manager = DiversityManager()
     

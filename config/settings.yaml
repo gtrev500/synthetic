@@ -3,24 +3,29 @@ database:
 generation:
   batch_size: 5
   default_num_essays: 60
+  # Global base tokens for essay generation
+  base_max_tokens: 3000
 models:
-- max_tokens: 1500
-  model: gpt-4o
+- model: openai/gpt-4o
   name: ChatGPT 4o
   provider: openai
   temperature: 0.8
-- max_tokens: 1500
-  model: gemini-2.5-pro-preview
+  # Token multiplier relative to base
+  token_multiplier: 1.0
+- model: gemini/gemini-2.5-pro-preview-05-06 
   name: Gemini 2.5 Pro
   provider: gemini
   temperature: 0.8
-- max_tokens: 1500
-  model: claude-3-7-sonnet
+  # 2x for thinking tokens overhead
+  token_multiplier: 2.0
+- model: anthropic/claude-3-7-sonnet-latest
   name: Claude 3.7 Sonnet
   provider: anthropic
   temperature: 1.0
+  # 1.2x for slightly more verbose responses
+  token_multiplier: 1.2
 output:
   directory: output
 research:
   num_seeds: 10
-  perplexity_model: llama-2-70b
+  perplexity_model: sonar

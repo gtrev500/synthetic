@@ -27,6 +27,7 @@ class Settings:
         # Generation settings
         self.default_num_essays = self.config.get("generation", {}).get("default_num_essays", 60)
         self.batch_size = self.config.get("generation", {}).get("batch_size", 5)
+        self.base_max_tokens = self.config.get("generation", {}).get("base_max_tokens", 1500)
         
     def _load_config(self) -> Dict:
         if not os.path.exists(self.config_path):
@@ -68,7 +69,8 @@ class Settings:
             ],
             "generation": {
                 "default_num_essays": 60,
-                "batch_size": 5
+                "batch_size": 5,
+                "base_max_tokens": 1500
             },
             "research": {
                 "num_seeds": 10,

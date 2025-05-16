@@ -20,8 +20,8 @@ class SyntheticEssaySystem:
         self.db = DatabaseManager(self.settings.db_path)
         self.research = ResearchSeedGenerator(self.settings.perplexity_api_key)
         self.diversity = DiversityManager()
-        self.llm_manager = LLMManager(self.settings.models)
-        self.generator = EssayGenerator(self.settings.models, self.db)
+        self.llm_manager = LLMManager(self.settings.models, self.settings.base_max_tokens)
+        self.generator = EssayGenerator(self.settings.models, self.db, self.settings.base_max_tokens)
         self.exporter = MarkdownExporter(self.settings.output_dir)
         self.analytics = AnalyticsGenerator(self.settings.output_dir)
     
