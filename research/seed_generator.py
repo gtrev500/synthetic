@@ -44,17 +44,18 @@ class ResearchSeedGenerator:
         query = f"""
         Research the following aspect of {topic}: {angle}
         
-        Please provide:
-        1. Key Facts: List 5-7 specific, relevant facts
-        2. Expert Quotes: Include 2-3 quotes from experts or studies
-        3. Sources: List credible sources and references
+        Please provide a structured JSON response with:
+        1. facts: A list of 5-7 specific, relevant facts about this aspect of {topic}
+        2. quotes: A list of 2-3 quotes from experts or studies, with proper attribution
+        3. sources: A list of credible sources and references with full citations
         
         Focus on providing diverse, specific information that would help a student write an essay.
+        Ensure all information is accurate, recent, and relevant to {angle}.
         """
         
         try:
             response = await self.client.search(query)
-            parsed_data = self.client._parse_response(response)
+            parsed_data = self.client.parse_structured_response(response)
             
             return {
                 'angle': angle,
