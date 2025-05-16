@@ -1,0 +1,26 @@
+database:
+  path: synthetic_essays.db
+generation:
+  batch_size: 5
+  default_num_essays: 60
+models:
+- max_tokens: 1500
+  model: gpt-4o
+  name: ChatGPT 4o
+  provider: openai
+  temperature: 0.8
+- max_tokens: 1500
+  model: gemini-2.5-pro-preview
+  name: Gemini 2.5 Pro
+  provider: gemini
+  temperature: 0.8
+- max_tokens: 1500
+  model: claude-3-7-sonnet
+  name: Claude 3.7 Sonnet
+  provider: anthropic
+  temperature: 1.0
+output:
+  directory: output
+research:
+  num_seeds: 10
+  perplexity_model: llama-2-70b

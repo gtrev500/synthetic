@@ -4,7 +4,7 @@ Example usage of the synthetic essay generation system.
 """
 
 import asyncio
-from synthetic_essays import SyntheticEssaySystem
+from main import SyntheticEssaySystem
 
 async def example_small_corpus():
     """Generate a small corpus of essays for testing."""
