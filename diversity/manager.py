@@ -74,8 +74,8 @@ class DiversityManager:
         style_prompt = self.style_manager.create_style_prompt(style)
         quality_prompt = self.quality_manager.create_quality_prompt(quality)
         
-        # Combine into comprehensive prompt
-        full_prompt = f"""You are writing an essay for an English 202 Critical Thinking course.
+        # Create base prompt (research context and general requirements)
+        base_prompt = f"""You are writing an essay for an English 202 Critical Thinking course.
 
 RESEARCH CONTEXT:
 Topic Angle: {seed['angle']}
@@ -86,6 +86,12 @@ Expert Perspectives:
 {chr(10).join(f'- {quote}' for quote in seed['quotes'][:3])}
 
 ESSAY REQUIREMENTS:
+Write ONLY the essay text itself. Do not include any meta-commentary, titles, or headers. Begin directly with your introduction paragraph.
+
+The essay should be approximately 750-1000 words."""
+        
+        # Create modulated prompt (base + diversity components)
+        modulated_prompt = f"""{base_prompt}
 
 {stance_prompt}
 
@@ -95,15 +101,22 @@ ESSAY REQUIREMENTS:
 
 {style_prompt}
 
-{quality_prompt}
-
-IMPORTANT: Write ONLY the essay text itself. Do not include any meta-commentary, titles, or headers. Begin directly with your introduction paragraph.
-
-The essay should be approximately 750-1000 words."""
+{quality_prompt}"""
+        
+        # Create prompt metadata
+        prompt_metadata = {
+            'stance': stance_prompt,
+            'persona': persona_prompt,
+            'evidence': evidence_prompt,
+            'style': style_prompt,
+            'quality': quality_prompt
+        }
         
         return {
-            'prompt': full_prompt,
-            'metadata': combination
+            'prompt': modulated_prompt,  # The full prompt for the LLM
+            'base_prompt': base_prompt,  # The base prompt without diversity
+            'prompt_metadata': prompt_metadata,  # Breakdown of diversity components
+            'metadata': combination  # Original combination data
         }
     
     def get_diversity_report(self, combinations: List[Dict]) -> Dict:

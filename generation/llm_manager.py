@@ -66,10 +66,16 @@ class LLMManager:
                 'last_failure': time.time()
             }
     
-    async def generate_essay(self, prompt: str, model_config: Dict, metadata: Dict) -> Optional[Dict]:
+    async def generate_essay(self, prompt_data: Dict, model_config: Dict) -> Optional[Dict]:
         """Generate a single essay using specified model with rate limit handling."""
         provider = model_config.get('provider', 'unknown')
         max_retries = 5
+        
+        # Extract prompt and metadata
+        prompt = prompt_data['prompt']
+        metadata = prompt_data['metadata']
+        base_prompt = prompt_data.get('base_prompt', '')
+        prompt_metadata = prompt_data.get('prompt_metadata', {})
         
         for attempt in range(max_retries):
             try:
@@ -135,7 +141,10 @@ class LLMManager:
                     'temperature': model_config.get('temperature', 0.8),
                     'word_count': len(content.split()),
                     'prompt_hash': prompt_hash,
-                    'metadata': metadata
+                    'metadata': metadata,
+                    'base_prompt': base_prompt,
+                    'modulated_prompt': prompt,
+                    'prompt_metadata': prompt_metadata
                 }
                 
             except RateLimitError as e:
@@ -165,11 +174,8 @@ class LLMManager:
         tasks = []
         
         for prompt_data in prompts:
-            prompt = prompt_data['prompt']
-            metadata = prompt_data['metadata']
-            
             for model_config in models:
-                task = self.generate_essay(prompt, model_config, metadata)
+                task = self.generate_essay(prompt_data, model_config)
                 tasks.append(task)
         
         # Run all tasks concurrently

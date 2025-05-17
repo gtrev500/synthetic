@@ -1,4 +1,5 @@
 import asyncio
+import hashlib
 from datetime import datetime
 from typing import Dict, List
 
@@ -44,6 +45,19 @@ class EssayGenerator:
                     metadata['seed'].get('sources', [])
                 )
                 
+                # Save prompt to database
+                prompt_hash = essay['prompt_hash']
+                base_prompt = essay.get('base_prompt', '')
+                modulated_prompt = essay.get('modulated_prompt', '')
+                prompt_metadata = essay.get('prompt_metadata', {})
+                
+                saved_prompt = self.db_manager.save_prompt(
+                    base_prompt=base_prompt,
+                    modulated_prompt=modulated_prompt,
+                    metadata=prompt_metadata,
+                    prompt_hash=prompt_hash
+                )
+                
                 # Save components to database if they don't exist
                 stance = self.db_manager.get_or_create_stance(metadata['stance'])
                 persona = self.db_manager.save_persona(metadata['persona'])
@@ -63,6 +77,7 @@ class EssayGenerator:
                     'model_name': essay['model_name'],
                     'temperature': essay['temperature'],
                     'prompt_hash': essay['prompt_hash'],
+                    'prompt_id': saved_prompt.id,  # Link to saved prompt
                     'metadata': metadata  # Preserve original metadata for export
                 }
                 

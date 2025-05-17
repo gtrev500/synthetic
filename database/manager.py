@@ -9,14 +9,28 @@ from sqlalchemy.exc import SQLAlchemyError
 
 from database.schema import (
     Base, ResearchSeed, Stance, Persona, EvidencePattern,
-    StyleParameter, QualityLevel, Essay, GenerationRun
+    StyleParameter, QualityLevel, Essay, GenerationRun, Prompt
 )
 
 class DatabaseManager:
     def __init__(self, db_path: str = "synthetic_essays.db"):
         self.engine = create_engine(f"sqlite:///{db_path}", echo=False)
-        Base.metadata.create_all(self.engine)
+        self.db_path = db_path
+        self._ensure_schema()
         self.SessionLocal = sessionmaker(bind=self.engine, expire_on_commit=False)
+    
+    def _ensure_schema(self):
+        """Ensure the database schema is up to date."""
+        Base.metadata.create_all(self.engine)
+        
+        # Check if we need to run migrations
+        from database.migration import migrate_database
+        try:
+            migrate_database(self.db_path)
+        except Exception as e:
+            # Log migration errors but don't fail initialization
+            import logging
+            logging.getLogger(__name__).warning(f"Migration warning: {e}")
     
     @contextmanager
     def get_session(self):
@@ -122,7 +136,8 @@ class DatabaseManager:
                 quality_id=essay_data['quality_id'],
                 model_name=essay_data['model_name'],
                 temperature=essay_data['temperature'],
-                prompt_hash=essay_data['prompt_hash']
+                prompt_hash=essay_data['prompt_hash'],
+                prompt_id=essay_data.get('prompt_id')  # Add prompt_id if provided
             )
             session.add(essay)
             session.flush()
@@ -148,6 +163,24 @@ class DatabaseManager:
                 created_at=datetime.now()
             )
             session.add(run)
+    
+    def save_prompt(self, base_prompt: str, modulated_prompt: str, metadata: Dict, prompt_hash: str) -> Prompt:
+        with self.get_session() as session:
+            # Check if prompt already exists by hash
+            existing = session.query(Prompt).filter_by(hash=prompt_hash).first()
+            if existing:
+                return existing
+            
+            prompt = Prompt(
+                base_prompt=base_prompt,
+                modulated_prompt=modulated_prompt,
+                prompt_metadata=metadata,
+                hash=prompt_hash,
+                created_at=datetime.now()
+            )
+            session.add(prompt)
+            session.flush()
+            return prompt
     
     def get_stance_by_name(self, name: str) -> Optional[Stance]:
         with self.get_session() as session:

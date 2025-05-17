@@ -73,6 +73,18 @@ class QualityLevel(Base):
     
     essays = relationship("Essay", back_populates="quality")
 
+class Prompt(Base):
+    __tablename__ = 'prompts'
+    
+    id = Column(Integer, primary_key=True)
+    base_prompt = Column(Text)
+    modulated_prompt = Column(Text)
+    prompt_metadata = Column(JSON)  # Store breakdown of prompt components
+    hash = Column(String(64))  # SHA-256 hash for deduplication
+    created_at = Column(DateTime)
+    
+    essays = relationship("Essay", back_populates="prompt")
+
 class Essay(Base):
     __tablename__ = 'essays'
     
@@ -88,6 +100,7 @@ class Essay(Base):
     evidence_id = Column(Integer, ForeignKey('evidence_patterns.id'))
     style_id = Column(Integer, ForeignKey('style_parameters.id'))
     quality_id = Column(Integer, ForeignKey('quality_levels.id'))
+    prompt_id = Column(Integer, ForeignKey('prompts.id'))  # New foreign key
     
     # Additional metadata
     model_name = Column(String(100))
@@ -101,6 +114,7 @@ class Essay(Base):
     evidence = relationship("EvidencePattern", back_populates="essays")
     style = relationship("StyleParameter", back_populates="essays")
     quality = relationship("QualityLevel", back_populates="essays")
+    prompt = relationship("Prompt", back_populates="essays")  # New relationship
 
 class GenerationRun(Base):
     __tablename__ = 'generation_runs'
