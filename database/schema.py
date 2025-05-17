@@ -127,3 +127,18 @@ class GenerationRun(Base):
     total_essays = Column(Integer)
     duration_seconds = Column(Float)
     created_at = Column(DateTime)
+
+class PersonaUsage(Base):
+    __tablename__ = 'persona_usage'
+    
+    id = Column(Integer, primary_key=True)
+    persona_id = Column(Integer, ForeignKey('personas.id'))
+    topic = Column(String(500))
+    stance_id = Column(Integer, ForeignKey('stances.id'))
+    essay_id = Column(Integer, ForeignKey('essays.id'))
+    created_at = Column(DateTime)
+    
+    # Relationships
+    persona = relationship("Persona")
+    stance = relationship("Stance")
+    essay = relationship("Essay")
