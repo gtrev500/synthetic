@@ -27,6 +27,7 @@ generated_essays/
 
 # Logs
 *.log
+.*.md
 
 # OS files
 .DS_Store
