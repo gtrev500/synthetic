@@ -33,6 +33,7 @@ class Persona(Base):
     background = Column(String(200))
     strengths = Column(JSON)
     weaknesses = Column(JSON)
+    interests = Column(JSON)
     created_at = Column(DateTime)
     
     essays = relationship("Essay", back_populates="persona")

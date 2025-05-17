@@ -77,6 +77,7 @@ class DatabaseManager:
                 background=persona_data['background'],
                 strengths=persona_data['strengths'],
                 weaknesses=persona_data['weaknesses'],
+                interests=persona_data.get('interests', []),
                 created_at=datetime.now()
             )
             session.add(persona)
