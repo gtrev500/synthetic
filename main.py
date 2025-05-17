@@ -86,7 +86,7 @@ class SyntheticEssaySystem:
         
         # 5. Export as markdown
         print("Exporting markdown files...")
-        self.exporter.export_essays(essays, run_id)
+        self.exporter.export_essays(essays, run_id, topic)
         print(f"  Exported to: {self.settings.output_dir}/{run_id}/")
         print()
         
