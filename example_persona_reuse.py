@@ -59,8 +59,11 @@ def demonstrate_persona_reuse():
     
     # 5. Find underused personas
     print("5. Finding underused personas:")
-    underused = repo.find_underused_personas(max_usage_count=5, cooldown_hours=1)
-    print(f"   Found {len(underused)} personas used less than 5 times")
+    underused = repo.find_underused_personas(max_usage_count=5, limit=5)
+    print(f"   Found {len(underused)} personas used less than 5 times (limited to 5)")
+    print("   Top 5 least used personas:")
+    for persona, usage_count in underused:
+        print(f"   - {persona.background}: {usage_count} uses")
     print()
     
     # 6. Complex query example
@@ -70,8 +73,8 @@ def demonstrate_persona_reuse():
     # Get compatible personas
     candidates = repo.find_compatible_for_topic(new_topic, min_compatibility_score=0.2)
     
-    # Filter by underused
-    underused_ids = {p.id for p in underused}
+    # Filter by underused (now working with tuples)
+    underused_ids = {p.id for p, _ in underused}
     available_candidates = [(p, s) for p, s in candidates if p.id in underused_ids]
     
     print(f"   Topic: '{new_topic}'")

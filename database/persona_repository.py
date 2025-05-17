@@ -5,7 +5,7 @@ Provides sophisticated querying capabilities for finding and reusing personas.
 
 import json
 from typing import List, Dict, Optional, Set, Any
-from datetime import datetime, timedelta
+from datetime import datetime
 from sqlalchemy import and_, or_, func, text
 from sqlalchemy.orm import Session
 
@@ -198,46 +198,48 @@ class PersonaRepository:
     def find_underused_personas(
         self, 
         max_usage_count: int = 3,
-        cooldown_hours: int = 24
-    ) -> List[Persona]:
+        limit: Optional[int] = None,
+        order_by_usage: bool = True
+    ) -> List[tuple[Persona, int]]:
         """
-        Find personas that haven't been overused.
+        Find personas that haven't been overused, ordered by usage count.
         
         Args:
             max_usage_count: Maximum number of essays per persona
-            cooldown_hours: Hours since last use before persona is available again
+            limit: Maximum number of results to return
+            order_by_usage: If True, order by usage count (least used first)
             
         Returns:
-            List of available personas
+            List of (Persona, usage_count) tuples
         """
         with self.Session() as session:
-            # Get usage counts
-            usage_counts = session.query(
+            # Subquery for usage counts
+            usage_subquery = session.query(
                 Essay.persona_id,
-                func.count(Essay.id).label('usage_count'),
-                func.max(Essay.created_at).label('last_used')
-            ).group_by(Essay.persona_id).all()
+                func.count(Essay.id).label('usage_count')
+            ).group_by(Essay.persona_id).subquery()
             
-            # Create lookup dictionaries
-            usage_dict = {uc[0]: (uc[1], uc[2]) for uc in usage_counts}
+            # Main query joining personas with usage data
+            query = session.query(
+                Persona,
+                func.coalesce(usage_subquery.c.usage_count, 0).label('usage_count')
+            ).outerjoin(
+                usage_subquery,
+                Persona.id == usage_subquery.c.persona_id
+            ).filter(
+                func.coalesce(usage_subquery.c.usage_count, 0) < max_usage_count
+            )
             
-            # Get all personas
-            all_personas = session.query(Persona).all()
+            # Order by usage count if requested
+            if order_by_usage:
+                query = query.order_by(func.coalesce(usage_subquery.c.usage_count, 0))
             
-            available_personas = []
-            cutoff_time = datetime.now() - timedelta(hours=cooldown_hours)
+            # Apply limit if specified
+            if limit:
+                query = query.limit(limit)
             
-            for persona in all_personas:
-                if persona.id not in usage_dict:
-                    # Never used
-                    available_personas.append(persona)
-                else:
-                    count, last_used = usage_dict[persona.id]
-                    # Fix: use AND logic for cooldown
-                    if count < max_usage_count and (last_used is None or last_used < cutoff_time):
-                        available_personas.append(persona)
-            
-            return available_personas
+            # Execute and return results
+            return query.all()
     
     def _extract_keywords(self, topic: str) -> Set[str]:
         """Extract keywords from topic text."""

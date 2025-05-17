@@ -25,7 +25,7 @@ def test_db():
     class MockDatabaseManager:
         def __init__(self):
             self.engine = engine
-            self.Session = Session
+            self.SessionLocal = Session
     
     db_manager = MockDatabaseManager()
     return db_manager
@@ -34,7 +34,7 @@ def test_db():
 @pytest.fixture
 def sample_personas(test_db):
     """Create sample personas for testing."""
-    Session = test_db.Session
+    Session = test_db.SessionLocal
     session = Session()
     
     personas = [
@@ -227,24 +227,31 @@ def test_find_underused_personas(test_db, sample_personas):
     results = repo.find_underused_personas(max_usage_count=3)
     
     # All personas should be available (1 has 2 uses, others have 0)
+    # Results are now tuples of (persona, usage_count)
     assert len(results) == 3
+    persona_ids = [p.id for p, _ in results]
+    assert set(persona_ids) == {1, 2, 3}
+    
+    # Check ordering - least used should come first
+    # Persona 2 and 3 have 0 uses, Persona 1 has 2 uses
+    usage_counts = [count for _, count in results]
+    assert usage_counts == sorted(usage_counts)  # Verify ascending order
     
     # Find personas with max 1 use  
     results = repo.find_underused_personas(max_usage_count=1)
     
-    # Only personas 2 and 3 should be available (persona 1 has 2 uses, which is > 1)
+    # Only personas 2 and 3 should be available (persona 1 has 2 uses)
     assert len(results) == 2
-    assert {p.id for p in results} == {2, 3}
+    persona_ids = [p.id for p, _ in results]
+    assert set(persona_ids) == {2, 3}
     
-    # Test cooldown period - persona 1 was used 1-2 days ago
-    results = repo.find_underused_personas(
-        max_usage_count=2,  # Persona 1 has 2 uses, so it's at the limit
-        cooldown_hours=12   # Last use was 1 day ago, which is > 12 hours
-    )
+    # Test with limit
+    results = repo.find_underused_personas(max_usage_count=3, limit=2)
+    assert len(results) <= 2
     
-    # Persona 1 should be excluded (at max usage), but 2 and 3 should be available
-    assert len(results) == 2
-    assert {p.id for p in results} == {2, 3}
+    # Test without ordering
+    results = repo.find_underused_personas(max_usage_count=3, order_by_usage=False)
+    assert len(results) == 3
 
 
 def test_extract_keywords(test_db):
