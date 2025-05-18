@@ -69,6 +69,7 @@ class EssayGenerator:
                 essay_data = {
                     'content': content_with_citations,
                     'seed_id': metadata['seed']['id'] if 'id' in metadata['seed'] else None,
+                    'topic': metadata['seed'].get('topic') or metadata['seed'].get('angle'),  # Include topic directly
                     'stance_id': stance.id,
                     'persona_id': persona.id,
                     'evidence_id': evidence.id,

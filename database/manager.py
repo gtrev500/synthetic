@@ -9,7 +9,7 @@ from sqlalchemy.exc import SQLAlchemyError
 
 from database.schema import (
     Base, ResearchSeed, Stance, Persona, EvidencePattern,
-    StyleParameter, QualityLevel, Essay, GenerationRun, Prompt
+    StyleParameter, QualityLevel, Essay, GenerationRun, Prompt, PersonaUsage
 )
 
 class DatabaseManager:
@@ -141,7 +141,25 @@ class DatabaseManager:
                 prompt_id=essay_data.get('prompt_id')  # Add prompt_id if provided
             )
             session.add(essay)
-            session.flush()
+            session.flush()  # Ensure essay gets an ID
+            
+            # Create PersonaUsage record to track persona usage
+            # Use topic directly from essay_data if available, otherwise fall back to seed lookup
+            topic = essay_data.get('topic')
+            if not topic and essay_data.get('seed_id'):
+                # Backward compatibility: query seed if topic not provided
+                seed = session.query(ResearchSeed).filter_by(id=essay_data['seed_id']).first()
+                topic = seed.angle if seed else None
+            
+            persona_usage = PersonaUsage(
+                persona_id=essay_data['persona_id'],
+                topic=topic,
+                stance_id=essay_data['stance_id'],
+                essay_id=essay.id,
+                created_at=datetime.now()
+            )
+            session.add(persona_usage)
+            
             return essay
     
     def save_essays(self, essays: List[Dict], run_id: str) -> List[Essay]:
