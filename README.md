@@ -6,6 +6,10 @@ A sophisticated system for generating diverse, authentic-looking student essays 
 
 Originally created to seed an LMS course with synthetic data to create a demo Canvas environment for my presentation to educators on AI usage. There was no simple dataset of bulk, authentic looking student essays on single topics (I looked!). This projects aims to satisfy that gap and generate authentic-looking essays to populate a sandbox LMS environment. 
 
+### Demo
+
+See outputs in [demos](./demo/)
+
 ## Features
 
 - **Multi-LLM Support**: Works with OpenAI, Anthropic, Google Gemini, and more via litellm
