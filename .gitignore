@@ -32,3 +32,5 @@ generated_essays/
 # OS files
 .DS_Store
 Thumbs.db
+
+testing/
