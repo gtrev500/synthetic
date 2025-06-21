@@ -2,6 +2,10 @@
 
 A sophisticated system for generating diverse, authentic-looking student essays for educational demonstrations. Uses multiple LLMs and a multi-dimensional diversity framework to create realistic essay corpora.
 
+## Purpose
+
+Originally created to seed an LMS course with synthetic data to create a demo Canvas environment for my presentation to educators on AI usage. There was no simple dataset of bulk, authentic looking student essays on single topics (I looked!). This projects aims to satisfy that gap and generate authentic-looking essays to populate a sandbox LMS environment. 
+
 ## Features
 
 - **Multi-LLM Support**: Works with OpenAI, Anthropic, Google Gemini, and more via litellm
@@ -127,8 +131,14 @@ To extend the system:
 
 ## License
 
-[Your license here]
+This project is licensed under CC BY-NC 4.0.
 
-## Contributing
+## Ethical Considerations
 
-[Contributing guidelines]
+This system generates synthetic essays that emulate various student populations and writing characteristics, including:
+- Non-native English speakers
+- International students
+- First-generation college students
+- Students from diverse educational backgrounds
+
+LLM generated texts may exhibit stereotypes or biases. This system was built for demo usage and therefore [persona emulation](./diversity/personas.py) should be heavily scrutinized in any public-facing integrations. 
