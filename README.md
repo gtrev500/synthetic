@@ -24,6 +24,54 @@ See outputs in [demos](./demo/)
 - **Markdown Output**: Clean, organized essay files with full metadata
 - **Analytics Dashboard**: Generation statistics and diversity reports
 
+## How It Works
+
+The system transforms a simple essay prompt into a diverse corpus of authentic-looking student essays through a multi-stage process:
+
+```mermaid
+graph TD
+    A[Essay Topic/Prompt] --> B[Perplexity API]
+    B --> C[Research Seeds<br/>First Entropy Creation]
+    C --> D{Diversity Manager}
+    
+    D --> E1[Stance<br/>strongly for ↔ against]
+    D --> E2[Persona<br/>12+ backgrounds]
+    D --> E3[Evidence Pattern<br/>5 types]
+    D --> E4[Writing Style<br/>formality, complexity]
+    D --> E5[Quality Level<br/>Grades B-F]
+    
+    E1 & E2 & E3 & E4 & E5 --> F[Prompt Builder<br/>Combines all attributes]
+    
+    F --> G1[GPT-4o]
+    F --> G2[Gemini 2.5 Pro]
+    F --> G3[Claude 3.7 Sonnet]
+    
+    G1 & G2 & G3 --> H[Diverse Essay Corpus]
+    
+    style C fill:#ff9999,stroke:#333,stroke-width:4px
+    style D fill:#99ccff,stroke:#333,stroke-width:2px
+    style H fill:#99ff99,stroke:#333,stroke-width:2px
+```
+
+### Generation Flow
+
+1. **Initial Entropy**: The Perplexity API creates the first layer of diversity by generating unique research seeds:
+   - **Input - Research Angles**: 10+ different perspectives (e.g., ethical, economic, social justice, technological)
+   - **Output - Structured Data**: Each seed returns 5-7 facts, 2-3 expert quotes, and credible sources
+   - **Dynamic Adaptation**: Angles are customized to the specific topic
+   - **Parallel Generation**: Multiple seeds generated concurrently for efficiency
+
+2. **Diversity Attribution**: Multiple dimensions of variation are layered onto each research seed:
+   - Argument stance (position and certainty)
+   - Student persona (background, strengths, weaknesses)
+   - Evidence patterns (how arguments are supported)
+   - Writing style (formality, complexity, emotionality)
+   - Quality level (grade-appropriate characteristics)
+
+3. **Multi-Model Generation**: The enriched prompts are sent to three different LLMs, adding another layer of variation in writing patterns and expression.
+
+4. **Result**: Each essay is unique, combining research-based content with authentic student characteristics.
+
 ## Installation
 
 1. Clone the repository:
